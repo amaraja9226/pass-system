@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Admin Dashboard - Pending Applications</h2>
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th>Student Name</th>
+      <th>Department</th>
+      <th>Reason</th>
+      <th>Application Date</th>
+      <th>Status</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for app in applications %}
+    <tr>
+      <td>{{ app.name }}</td>
+      <td>{{ app.department }}</td>
+      <td>{{ app.reason }}</td>
+      <td>{{ app.application_date }}</td>
+      <td>{{ app.status }}</td>
+      <td>
+        {% if app.status == "Pending" %}
+          <a href="{% url 'approve_application' app.id %}" class="btn btn-success btn-sm">Approve</a>
+          <a href="{% url 'reject_application' app.id %}" class="btn btn-danger btn-sm">Reject</a>
+        {% else %}
+          Approved / Rejected
+        {% endif %}
+        <a href="{% url 'download_application_pdf' app.id %}" class="btn btn-primary btn-sm">View PDF</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

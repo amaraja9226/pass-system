@@ -1,0 +1,115 @@
+/* ====== Home Page Style ====== */
+.home-bg {
+    background: linear-gradient(180deg, #f7f9fc 0%, #e9ecef 100%);
+    min-height: 100vh;
+  }
+  
+  .dashboard-card {
+    border-radius: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s;
+    height: 100%;
+  }
+  
+  .dashboard-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  }
+  
+  .dashboard-card h4 {
+    color: #2c3e50;
+    font-weight: 600;
+  }
+  
+  .navbar-brand {
+    font-size: 1.3rem;
+  }
+  
+  footer {
+    position: relative;
+    bottom: 0;
+    width: 100%;
+  }
+
+/* Existing styles kept */
+.home-bg {
+  background: linear-gradient(180deg, #f7f9fc 0%, #e9ecef 100%);
+  min-height: 100vh;
+}
+
+.dashboard-card {
+  border-radius: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s;
+  height: 100%;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.dashboard-card h4 {
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.navbar-brand {
+  font-size: 1.3rem;
+}
+
+footer {
+  position: relative;
+  bottom: 0;
+  width: 100%;
+}
+
+/* New styles */
+.offer-card h4 {
+  color: #ff6f00;
+  font-weight: 600;
+}
+
+.offer-card p {
+  color: #555;
+  margin-top: 10px;
+}
+
+img {
+  max-height: 200px;
+}
+/* office section */
+/* ====== FAQ Section ====== */
+.faq-section h2 {
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.accordion-button {
+  font-weight: 500;
+  color: #34495e;
+}
+
+/* ====== Offices Section ====== */
+.office-card {
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s;
+}
+
+.office-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.office-card h5 {
+  color: #e67e22;
+  font-weight: 600;
+}
+
+.office-card p {
+  margin: 0;
+  color: #555;
+}
+
+

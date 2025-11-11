@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Create Pass Challan</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<div class="container py-5">
+  <div class="card shadow-lg p-4">
+    <h3 class="text-center mb-4 text-primary">🎫 Create Pass Challan</h3>
+
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+
+    <div id="error-message" class="alert alert-danger" style="display:none;"></div>
+    <div id="loading" class="alert alert-info" style="display:none;">Validating Receipt ID...</div>
+
+    <form method="POST" id="passForm">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label class="form-label">Receipt ID</label>
+        {{ form.receipt_id }}
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Student Name</label>
+        {{ form.student_name }}
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Class</label>
+        {{ form.student_class }}
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Department</label>
+        {{ form.department }}
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Village</label>
+        {{ form.village }}
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Amount</label>
+        {{ form.amount }}
+      </div>
+      <button type="submit" class="btn btn-success w-100">Create Pass</button>
+    </form>
+  </div>
+</div>
+
+<script>
+const receiptInput = document.getElementById('receipt_id');
+const studentNameInput = document.getElementById('student_name');
+const studentClassInput = document.getElementById('student_class');
+const departmentInput = document.getElementById('department');
+const villageInput = document.getElementById('village');
+const amountInput = document.getElementById('amount');
+const errorDiv = document.getElementById('error-message');
+const loadingDiv = document.getElementById('loading');
+
+let typingTimer;
+const doneTypingInterval = 600; // wait before validating
+
+receiptInput.addEventListener('input', function () {
+  clearTimeout(typingTimer);
+  const receiptId = this.value.trim();
+  if (receiptId) {
+    typingTimer = setTimeout(() => validateReceipt(receiptId), doneTypingInterval);
+  } else {
+    clearForm();
+  }
+});
+
+function validateReceipt(receiptId) {
+  loadingDiv.style.display = 'block';
+  errorDiv.style.display = 'none';
+
+  fetch(`/pass_system/validate-receipt/?receipt_id=${encodeURIComponent(receiptId)}`)
+    .then(response => response.json())
+    .then(data => {
+      loadingDiv.style.display = 'none';
+
+      if (data.valid) {
+        studentNameInput.value = data.data.student_name;
+        studentClassInput.value = data.data.student_class;
+        departmentInput.value = data.data.department;
+        villageInput.value = data.data.village;
+        amountInput.value = data.data.amount;
+        errorDiv.style.display = 'none';
+      } else {
+        clearForm();
+        errorDiv.innerText = data.message;
+        errorDiv.style.display = 'block';
+      }
+    })
+    .catch(err => {
+      loadingDiv.style.display = 'none';
+      clearForm();
+      errorDiv.innerText = 'Error validating receipt. Please try again.';
+      errorDiv.style.display = 'block';
+    });
+}
+
+function clearForm() {
+  studentNameInput.value = '';
+  studentClassInput.value = '';
+  departmentInput.value = '';
+  villageInput.value = '';
+  amountInput.value = '';
+}
+</script>
+
+</body>
+</html>

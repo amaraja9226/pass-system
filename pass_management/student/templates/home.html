@@ -1,0 +1,259 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>🎫 Student Pass Management</title>
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="{% static 'student/css/style.css' %}">
+</head>
+<body class="home-bg">
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow">
+    <div class="container-fluid">
+      <a class="navbar-brand fw-bold" href="#">🎓 Pass Management</a>
+      <div class="d-flex">
+        {% if user.is_authenticated %}
+          <span class="text-white me-3">Welcome, {{ user.username|title }}</span>
+          <a href="{% url 'logout' %}" class="btn btn-outline-light btn-sm">Logout</a>
+          {% else %}
+          <button type="button" class="btn btn-outline-light btn-sm" data-bs-toggle="modal" data-bs-target="#adminLoginModal">
+            Admin Login
+          </button>
+        {% endif %}
+      </div>
+    </div>
+  </nav>
+
+  <!-- Dashboard Cards -->
+  <div class="container py-5">
+    <h2 class="text-center text-dark mb-4">Student Dashboard</h2>
+    <div class="row justify-content-center">
+      <div class="col-md-3 mb-4">
+        <div class="card dashboard-card">
+          <div class="card-body text-center">
+            <h4>Get Application </h4>
+            <p class="text-muted">Apply for a new monthly student pass.</p>
+       <a href="{% url 'create_application' %}" class="btn btn-warning w-100 mb-2">Create Application</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3 mb-4">
+        <div class="card dashboard-card">
+          <div class="card-body text-center">
+            <h4>New Pass</h4>
+            <p class="text-muted">Get a new pass for new student in the college</p>
+            <a href="{% url 'create_pass'%} "  class="btn btn-success w-100">New Pass</a>
+
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-3 mb-4">
+        <div class="card dashboard-card">
+          <div class="card-body text-center">
+            <h4>♻️ ReNew Pass</h4>
+            <p class="text-muted">Renew your existing pass in our existing college student  easily.</p>
+            <a href="#" class="btn btn-success w-100">Renew Pass</a>
+          </div>
+        </div>
+      </div>
+
+     
+      <div class="col-md-3 mb-4">
+        <div class="card dashboard-card">
+          <div class="card-body text-center">
+            <h4>📄 View Pass Status</h4>
+            <p class="text-muted">Check your pass approval or renewal status.</p>
+            <a href="{% url 'pass_list'%} " class="btn btn-info w-100 mt-2">View Issued Passes</a>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bus Images Section -->
+  <section class="bus-section text-center py-5">
+    <h3 class="mb-4">Our Buses</h3>
+    <div class="bus-images d-flex justify-content-center gap-3 flex-wrap">
+      <img src="{% static 'images/bus.jpg' %}" alt="Yellow Bus 1" class="bus-img">
+    </div>
+  </section>
+
+  <!-- Special Offer Section -->
+  <section class="offers-section py-5 bg-light text-center">
+    <h3 class="mb-4">Special Offers</h3>
+    <div class="row justify-content-center">
+      <div class="col-md-3 mb-3">
+        <div class="offer-card p-3 shadow rounded">
+          <h5>1 Year Pass</h5>
+          <p>Get a Permanent Seat Booked for the whole year</p>
+        </div>
+      </div>
+      <div class="col-md-3 mb-3">
+        <div class="offer-card p-3 shadow rounded">
+          <h5>6 Month Pass</h5>
+          <p>Get 1 Month Free (or any bonus) on your choice</p>
+        </div>
+      </div>
+      <div class="col-md-3 mb-3">
+        <div class="offer-card p-3 shadow rounded">
+          <h5>3 Month Pass</h5>
+          <p>Get Extra 1 Week Free On your choice</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Why Use Online Pass Section -->
+  <section class="why-use-section py-5 text-center">
+    <h3 class="mb-4">Why Use Our Online Pass System?</h3>
+    <p class="mx-auto" style="max-width:800px;">
+      The online pass management system makes it easy and quick to apply, renew, and track your student passes.
+      No more paperwork, long queues, or manual errors. Secure, fast, and available anytime, anywhere.
+    </p>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="faq-section py-5 bg-light">
+    <div class="container">
+      <h3 class="text-center mb-4">Frequently Asked Questions</h3>
+      <div class="accordion" id="faqAccordion">
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="faq1">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1">
+              How do I apply for a new pass?
+            </button>
+          </h2>
+          <div id="collapse1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+            <div class="accordion-body">
+              You can apply for a new student pass online by clicking the "Get New Pass" button, filling your details, and submitting the application.
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="faq2">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2">
+              Can I renew my pass online?
+            </button>
+          </h2>
+          <div id="collapse2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+            <div class="accordion-body">
+              Yes! Click the "Renew Pass" button, select your current pass, and follow the online renewal process.
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="faq3">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3">
+              How long does it take to get a pass approved?
+            </button>
+          </h2>
+          <div id="collapse3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+            <div class="accordion-body">
+              Approval usually takes 1-3 business days. You will be notified via email and your dashboard.
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="faq4">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse4">
+              Can I cancel my pass after applying?
+            </button>
+          </h2>
+          <div id="collapse4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+            <div class="accordion-body">
+              You can cancel before approval. After approval, cancellation depends on pass type.
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="faq5">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse5">
+              What are the benefits of the online pass system?
+            </button>
+          </h2>
+          <div id="collapse5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+            <div class="accordion-body">
+              Saves time, reduces paperwork, easy tracking, secure, and accurate pass management.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Offices Section -->
+  <section class="offices-section py-5">
+    <div class="container">
+      <h2 class="text-center mb-4">Our Offices</h2>
+      <div class="row">
+        <div class="col-md-4 mb-3">
+          <div class="card office-card p-3">
+            <h5>Owner: Mr. Ramesh Sharma</h5>
+            <p>Department: Administration</p>
+            <p>Contact Number: +91 9876543210</p>
+          </div>
+        </div>
+        <div class="col-md-4 mb-3">
+          <div class="card office-card p-3">
+            <h5>Owner: Ms. Komal Singh</h5>
+            <p>Department: Student Services</p>
+            <p>Contact Number: +91 9123456780</p>
+          </div>
+        </div>
+        <div class="col-md-4 mb-3">
+          <div class="card office-card p-3">
+            <h5>Owner: Mr. Amit Verma</h5>
+            <p>Department: Transport</p>
+            <p>Contact Number: +91 9988776655</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="text-center py-3 bg-primary text-white shadow-sm">
+    <small>© 2025 Student Pass Management | Developed by SG Team</small>
+  </footer>
+
+  <!-- Admin Login Modal -->
+  <div class="modal fade" id="adminLoginModal" tabindex="-1" aria-labelledby="adminLoginModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title" id="adminLoginModalLabel">Admin Login</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form method="POST" action="{% url 'admin_login' %}">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label for="adminUsername" class="form-label">Username</label>
+              <input type="text" class="form-control" id="adminUsername" name="username" required>
+            </div>
+            <div class="mb-3">
+              <label for="adminPassword" class="form-label">Password</label>
+              <input type="password" class="form-control" id="adminPassword" name="password" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Login</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript -->
+  <script src="{% static 'student/js/script.js' %}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
