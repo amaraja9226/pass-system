@@ -1,9 +1,11 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Create Pass Challan</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
 </head>
 <body class="bg-light">
 
@@ -20,7 +22,7 @@
     <div id="error-message" class="alert alert-danger" style="display:none;"></div>
     <div id="loading" class="alert alert-info" style="display:none;">Validating Receipt ID...</div>
 
-    <form method="POST" id="passForm">
+    <form method="POST" enctype="multipart/form-data" id="passForm">
       {% csrf_token %}
       <div class="mb-3">
         <label class="form-label">Receipt ID</label>
@@ -46,7 +48,25 @@
         <label class="form-label">Amount</label>
         {{ form.amount }}
       </div>
+<div class="mb-3">
+    <label class="form-label">Student Signature</label>
+    {{ form.student_signature }}
+
+    <!-- FIX: preview image for auto-loaded signature -->
+    <img id="student_signature_img" src="" 
+         style="max-height: 120px; display:none; margin-top:10px; border:1px solid #ccc; padding:5px;">
+</div>
+    <div class="mb-3">
+  <label class="form-label">Admin Signature</label>
+  <img id="admin_signature_img" src="{% static 'signatures/admin.png' %}" style="max-height: 100px;">
+   </div>
+
+
       <button type="submit" class="btn btn-success w-100">Create Pass</button>
+      {% if form.instance.receipt_id %}
+     <a href="{% url 'view_receipt' form.instance.receipt_id %}" class="btn btn-primary mt-3">View Receipt</a>
+       {% endif %}
+
     </form>
   </div>
 </div>
@@ -58,11 +78,12 @@ const studentClassInput = document.getElementById('student_class');
 const departmentInput = document.getElementById('department');
 const villageInput = document.getElementById('village');
 const amountInput = document.getElementById('amount');
+const studentSignatureImg = document.getElementById('student_signature_img');
 const errorDiv = document.getElementById('error-message');
 const loadingDiv = document.getElementById('loading');
 
 let typingTimer;
-const doneTypingInterval = 600; // wait before validating
+const doneTypingInterval = 600;
 
 receiptInput.addEventListener('input', function () {
   clearTimeout(typingTimer);
@@ -89,11 +110,20 @@ function validateReceipt(receiptId) {
         departmentInput.value = data.data.department;
         villageInput.value = data.data.village;
         amountInput.value = data.data.amount;
+
+        if(data.data.student_signature_url) {
+          studentSignatureImg.src = data.data.student_signature_url;
+          studentSignatureImg.style.display = 'block';
+        } else {
+          studentSignatureImg.style.display = 'none';
+        }
+
         errorDiv.style.display = 'none';
       } else {
         clearForm();
         errorDiv.innerText = data.message;
         errorDiv.style.display = 'block';
+        studentSignatureImg.style.display = 'none';
       }
     })
     .catch(err => {
@@ -101,6 +131,7 @@ function validateReceipt(receiptId) {
       clearForm();
       errorDiv.innerText = 'Error validating receipt. Please try again.';
       errorDiv.style.display = 'block';
+      studentSignatureImg.style.display = 'none';
     });
 }
 

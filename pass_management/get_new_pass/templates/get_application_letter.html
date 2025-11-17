@@ -25,6 +25,14 @@
       <p>Thank you.</p>
       <p>Sincerely,</p>
       <p><strong>{{ app.name }}</strong></p>
+    
+      <h3>Student Signature:</h3>
+    {% if app.student_signature %}
+        <img src="{{ app.student_signature.url }}" alt="Student Signature" style="max-width:200px;">
+
+    {% else %}
+    <p>No signature uploaded.</p>
+    {% endif %}  
     </div>
 
     <a href="{% url 'download_application_pdf' app.id %}" class="btn btn-success w-100">💾 Download PDF</a>

@@ -18,6 +18,8 @@ from .models import PassApplication
 from django.contrib.auth.decorators import login_required
 from django.core.mail import EmailMessage
 from django.contrib.auth import logout
+from django.contrib import messages
+
 
 
 def admin_login(request):
@@ -60,27 +62,24 @@ def approve_application(request, app_id):
 # -----------------------------
 # Step 1: Form submit → Preview
 # -----------------------------
+
+
+
+
+from django.shortcuts import render
+from .forms import PassApplicationForm
+
 def create_application(request):
     if request.method == 'POST':
-        form = PassApplicationForm(request.POST)
+        form = PassApplicationForm(request.POST, request.FILES)  # ✅ Include request.FILES
         if form.is_valid():
-            app = PassApplication.objects.create(
-                name=form.cleaned_data['name'],
-                email=form.cleaned_data['email'],
-                department=form.cleaned_data['department'],
-                class_name=form.cleaned_data['class_name'],
-                village=form.cleaned_data['village'],
-                reason=form.cleaned_data['reason'],
-                pass_days=form.cleaned_data['pass_days'],
-                application_date=form.cleaned_data['application_date'],
-                application_time=form.cleaned_data['application_time'],
-                status='Pending'
-            )
+            app = form.save(commit=False)
+            app.status = 'Pending'
+            app.save()
             return render(request, 'get_application_letter.html', {'app': app})
     else:
         form = PassApplicationForm()
     return render(request, 'create_application.html', {'form': form})
-
 
 # -----------------------------
 # Step 2: Download PDF
@@ -108,16 +107,32 @@ def download_application_pdf(request, app_id):
   #sednt ot he custom admin
 
 
+from django.urls import reverse
+from django.urls import reverse
+
 def send_to_admin(request, application_id):
-    # Corrected function
     app = get_object_or_404(PassApplication, id=application_id)
-    
-    # Set status so it shows up in admin dashboard
     app.status = "Pending"
     app.save()
-    
-    # Optional: redirect student back to dashboard
-    return HttpResponse("✅ Application sent to Admin dashboard successfully!")
+
+    home_url = reverse('home')  # change 'home' if your URL name is different
+
+    return HttpResponse(f"""
+        <html>
+        <head>
+            <meta http-equiv="refresh" content="2;url={home_url}" />
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        </head>
+        <body class="bg-light d-flex justify-content-center align-items-center" style="height:100vh;">
+            <div class="text-center">
+                <div class="alert alert-success shadow-lg p-4 rounded">
+                    ✅ Application sent to Admin dashboard successfully!<br>
+                    <small>Redirecting to home page...</small>
+                </div>
+            </div>
+        </body>
+        </html>
+    """)
 
 #application pending
 
@@ -126,97 +141,80 @@ def send_to_admin(request, application_id):
 
 @login_required
 def approve_application(request, app_id):
-    # 1️⃣ Fetch the application
     app = get_object_or_404(PassApplication, id=app_id)
 
-    # 2️⃣ Update status & generate receipt ID
+    # Update status
     app.status = "Approved"
     app.receipt_id = f"REC-{app.id}-{app.application_date.strftime('%Y%m%d')}"
     app.save()
 
-    # 3️⃣ Generate PDF of application letter
+    # Generate PDF
     html_content = render_to_string(
         'get_application_letter.html',
         {'app': app, 'admin_signature': 'Admin Name'}
     )
+
     pdf_buffer = BytesIO()
     pisa_status = pisa.CreatePDF(src=html_content, dest=pdf_buffer)
 
     if pisa_status.err:
-        return HttpResponse("❌ Failed to generate PDF.")
+        messages.error(request, "❌ PDF generation failed.")
+        return redirect('home')
 
     pdf_buffer.seek(0)
 
-    # 4️⃣ Prepare email to student (via SMTP)
-    subject = f"Bus Pass Approved - Receipt ID {app.receipt_id}"
-    body = f"""
-Hello {app.name},
-
-Your bus pass application has been approved ✅
-Receipt ID: {app.receipt_id}
-
-Please find the attached PDF for your reference.
-
-Regards,
-Bus Admin
-"""
-
+    # Email
     email = EmailMessage(
-        subject=subject,
-        body=body,
-        from_email=settings.DEFAULT_FROM_EMAIL,  # Admin email
-        to=[app.email],  # Student email
-        cc=[settings.DEFAULT_FROM_EMAIL],        # Admin gets copy
+        subject="Your Bus Pass Application Approved",
+        body="Your application has been approved. Please find the attached PDF.",
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to=[app.email],
     )
 
-    # Attach PDF
-    email.attach(f"BusPass_{app.receipt_id}.pdf", pdf_buffer.getvalue(), 'application/pdf')
+    email.attach(
+        f"BusPass_{app.receipt_id}.pdf",
+        pdf_buffer.getvalue(),
+        "application/pdf"
+    )
 
     try:
-        email.send(fail_silently=False)  # Will raise error if SMTP fails
+        email.send()
+        messages.success(request, f"✅ Application approved. Email sent to: {app.email}")
     except Exception as e:
-        return HttpResponse(f"❌ Failed to send email: {e}")
+        messages.error(request, f"❌ Email sending failed: {e}")
 
-    return HttpResponse(f"✅ Application approved and email sent to {app.email} with PDF.")
+    # Redirect after message is set
+    return redirect('home')
 
-
-
-
-#rejec code
 
 @login_required
 def reject_application(request, app_id):
-    # 1️⃣ Fetch the application
     app = get_object_or_404(PassApplication, id=app_id)
 
-    # 2️⃣ Update status to Rejected
     app.status = "Rejected"
     app.save()
 
-    # 3️⃣ Prepare rejection email
     subject = f"Bus Pass Application Rejected - ID {app.id}"
     body = f"""
 Hello {app.name},
 
-We regret to inform you that your bus pass application (ID: {app.id}) has been rejected ❌.
+Your bus pass application (ID: {app.id}) has been rejected ❌.
 
-Please meet us in the college regarding your pass.
-
-Regards,
-Admin Team
+Please meet us in the college.
 """
 
     email = EmailMessage(
         subject=subject,
         body=body,
-        from_email=settings.DEFAULT_FROM_EMAIL,  # Admin email
-        to=[app.email],                           # Student email
-        cc=[settings.DEFAULT_FROM_EMAIL],         # Admin gets copy
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to=[app.email],
     )
 
     try:
-        email.send(fail_silently=False)  # Will raise error if SMTP fails
+        email.send()
+        messages.warning(request, f"⚠ Application rejected. Email sent to: {app.email}")
     except Exception as e:
-        return HttpResponse(f"❌ Failed to send rejection email: {e}")
+        messages.error(request, f"❌ Failed to send email: {e}")
 
-    return HttpResponse(f"✅ Application rejected and email sent to {app.email}.")
+    # Redirect after message is created
+    return redirect('home')

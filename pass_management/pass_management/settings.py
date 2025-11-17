@@ -139,6 +139,11 @@ MEDIA_ROOT = BASE_DIR / 'media'
 #LOGIN_REDIRECT_URL = '/'
 # LOGOUT_REDIRECT_URL = '/student/login/'
 
+
+
+#BREVO_API_KEY = "xkeysib-059ee108604e3726f976cab1dc6f05efd270681dbda8abd82aaeebec18c057c7-qglQ848RMEfyJHUZADMIN_EMAIL "
+#DEFAULT_FROM_EMAIL = "amarje952782@gmail.com"
+
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587            # ✅ Use 587, not 465
@@ -147,8 +152,4 @@ EMAIL_USE_SSL = False       # ✅ Add this line to avoid confusion
 EMAIL_HOST_USER = 'amarje952782@gmail.com'
 EMAIL_HOST_PASSWORD = 'bsrm xazt tnau krdv'   # ✅ Remove spaces from app password
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
-
-
-#BREVO_API_KEY = "xkeysib-059ee108604e3726f976cab1dc6f05efd270681dbda8abd82aaeebec18c057c7-qglQ848RMEfyJHUZADMIN_EMAIL "
-#DEFAULT_FROM_EMAIL = "amarje952782@gmail.com"
 

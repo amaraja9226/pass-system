@@ -1,4 +1,5 @@
-# models.py
+# get_new_pass/models.py
+
 from django.db import models
 
 class PassApplication(models.Model):
@@ -16,7 +17,13 @@ class PassApplication(models.Model):
         choices=[('Pending', 'Pending'), ('Approved', 'Approved'), ('Rejected', 'Rejected')],
         default='Pending'
     )
-    receipt_id = models.CharField(max_length=100, blank=True, null=True)  # stores generated ID
+    receipt_id = models.CharField(max_length=100, blank=True, null=True)
+    student_signature = models.FileField(
+        upload_to="signatures/student/",
+        null=True,
+        blank=True
+    )
+
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

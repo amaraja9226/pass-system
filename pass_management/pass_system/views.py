@@ -1,102 +1,90 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
-from django.contrib import messages
-from .forms import IssuePassForm
-from .models import IssuePass
+from django.conf import settings
 from get_new_pass.models import PassApplication
+from .models import IssuePass
+from .forms import IssuePassForm
+import os
+from datetime import date
 
 
+# --------------------------------------------------------------------
+# VALIDATE RECEIPT
+# --------------------------------------------------------------------
 def validate_receipt(request):
-    """
-    PassApplication database se receipt_id validate karta hai
-    Valid hone par student data return karta hai
-    """
-    if request.method == 'GET':
-        receipt_id = request.GET.get('receipt_id', '').strip()
-        print("🔍 Searching Receipt ID:", receipt_id)
+    receipt_id = request.GET.get('receipt_id', '').strip()
 
-        if not receipt_id:
-            return JsonResponse({'valid': False, 'message': 'Please enter a receipt ID.'})
+    if not receipt_id:
+        return JsonResponse({'valid': False, 'message': 'Receipt ID required!'})
 
-        try:
-            # PassApplication database se data fetch karo
-            application = PassApplication.objects.get(receipt_id=receipt_id)
-        except PassApplication.DoesNotExist:
-            print("❌ Invalid Receipt ID:", receipt_id)
-            return JsonResponse({'valid': False, 'message': 'Invalid Receipt ID. Please check and try again.'})
+    try:
+        application = PassApplication.objects.get(receipt_id=receipt_id)
+    except PassApplication.DoesNotExist:
+        return JsonResponse({'valid': False, 'message': 'Invalid Receipt ID!'})
 
-        # ✅ Only approved applications allowed
-        if application.status != "Approved":
-            print("⚠️ Application not approved yet:", application.status)
-            return JsonResponse({'valid': False, 'message': 'Application not approved yet.'})
+    if application.status != "Approved":
+        return JsonResponse({'valid': False, 'message': 'Application not approved yet!'})
 
-        # Village ke basis par amount calculate karo
-        amount = IssuePass.get_amount_for_village(application.village)
-        print("✅ Application Found:", application.name)
+    # Amount based on village
+    amount = IssuePass.get_amount_for_village(application.village)
 
-        # ✅ Correct field names (not student_name / student_class)
-        return JsonResponse({
-            'valid': True,
-            'data': {
-                'student_name': application.name,
-                'student_class': application.class_name,
-                'department': application.department,
-                'village': application.village,
-                'amount': amount
-            }
-        })
+    # Student signature from PassApplication
+    student_signature_url = (
+        request.build_absolute_uri(application.student_signature.url)
+        if application.student_signature else ''
+    )
 
-    return JsonResponse({'valid': False, 'message': 'Invalid request method.'})
+    return JsonResponse({
+        'valid': True,
+        'data': {
+            'student_name': application.name,
+            'student_class': application.class_name,
+            'department': application.department,
+            'village': application.village,
+            'amount': amount,
+            'student_signature_url': student_signature_url,
+        }
+    })
 
 
+# --------------------------------------------------------------------
+# CREATE PASS (AUTO SAVE)
+#se:
 def create_pass(request):
-    """
-    Pass challan create karta hai
-    Server-side validation: PassApplication database se data fetch karke IssuePass me save karta hai
-    """
     if request.method == 'POST':
-        receipt_id = request.POST.get('receipt_id', '').strip()
-        print("📜 Searching receipt_id:", receipt_id)
+        receipt_id = request.POST.get('receipt_id')
+        application = PassApplication.objects.get(receipt_id=receipt_id)
 
-        try:
-            # PassApplication database se validate karo
-            application = PassApplication.objects.get(receipt_id=receipt_id)
-            print("✅ Application Found:", application.name)
-        except PassApplication.DoesNotExist:
-            messages.error(request, f'Invalid Receipt ID: {receipt_id}. Please verify and try again.')
-            form = IssuePassForm()
-            return render(request, 'create_pass.html', {'form': form})
+        form = IssuePassForm(request.POST)
+        if form.is_valid():
+            issue_pass = form.save(commit=False)
 
-        # ✅ Only approved applications allowed
-        if application.status != "Approved":
-            messages.error(request, "Application not approved yet.")
-            return redirect('create_pass')
+            # AUTO COPY SIGNATURE FROM PassApplication ➝ IssuePass
+            issue_pass.student_signature = application.student_signature
 
-        # Village ke basis par amount calculate karo
-        amount = IssuePass.get_amount_for_village(application.village)
+            issue_pass.save()
 
-        # IssuePass database me save karo
-        issue_pass = IssuePass(
-            receipt_id=application.receipt_id,
-            student_name=application.name,
-            student_class=application.class_name,
-            department=application.department,
-            village=application.village,
-            amount=amount
-        )
-        issue_pass.save()
-
-        messages.success(request, f'Pass Challan created successfully! Pass Number: {issue_pass.pass_number}')
-        return redirect('create_pass')
+            return redirect('view_receipt', receipt_id=issue_pass.receipt_id)
     else:
         form = IssuePassForm()
 
     return render(request, 'create_pass.html', {'form': form})
 
 
+# --------------------------------------------------------------------
+# VIEW RECEIPT
+# --------------------------------------------------------------------
+def view_receipt(request, receipt_id):
+    issue_pass = get_object_or_404(IssuePass, receipt_id=receipt_id)
+    return render(request, 'receipt.html', {
+        'receipt': issue_pass,
+        'current_date': date.today()
+    })
+
+
+# --------------------------------------------------------------------
+# PASS LIST
+# --------------------------------------------------------------------
 def pass_list(request):
-    """
-    Sabhi issued passes ko display karta hai
-    """
     passes = IssuePass.objects.all()
     return render(request, 'pass_list.html', {'passes': passes})

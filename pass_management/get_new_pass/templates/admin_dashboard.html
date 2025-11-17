@@ -21,6 +21,7 @@
       <td>{{ app.reason }}</td>
       <td>{{ app.application_date }}</td>
       <td>{{ app.status }}</td>
+      <td>{{app.student_signature}}</td>
       <td>
         {% if app.status == "Pending" %}
           <a href="{% url 'approve_application' app.id %}" class="btn btn-success btn-sm">Approve</a>

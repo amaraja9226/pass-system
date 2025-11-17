@@ -12,7 +12,7 @@
   <div class="card shadow p-4 mx-auto" style="max-width: 700px;">
     <h2 class="text-center mb-4 text-primary">🎫 Create New Pass Application</h2>
 
-    <form method="post">
+    <form method="post" enctype="multipart/form-data">
       {% csrf_token %}
 
       {{ form.non_field_errors }}
