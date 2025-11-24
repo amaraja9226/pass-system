@@ -48,6 +48,16 @@
         <label class="form-label">Amount</label>
         {{ form.amount }}
       </div>
+      <div class="mb-3">
+  <label class="form-label">Month</label>
+  {{ form.month }}
+</div>
+<div class="mb-3">
+    <label class="form-label">Upload Your Photo</label>
+    {{ form.student_uploaded_photo }}
+</div>
+
+
 <div class="mb-3">
     <label class="form-label">Student Signature</label>
     {{ form.student_signature }}
@@ -56,6 +66,8 @@
     <img id="student_signature_img" src="" 
          style="max-height: 120px; display:none; margin-top:10px; border:1px solid #ccc; padding:5px;">
 </div>
+<input type="hidden" name="app_id" value="{{ app.id }}">
+
     <div class="mb-3">
   <label class="form-label">Admin Signature</label>
   <img id="admin_signature_img" src="{% static 'signatures/admin.png' %}" style="max-height: 100px;">
@@ -81,6 +93,8 @@ const amountInput = document.getElementById('amount');
 const studentSignatureImg = document.getElementById('student_signature_img');
 const errorDiv = document.getElementById('error-message');
 const loadingDiv = document.getElementById('loading');
+const monthInput = document.getElementById('month');
+
 
 let typingTimer;
 const doneTypingInterval = 600;
@@ -110,7 +124,7 @@ function validateReceipt(receiptId) {
         departmentInput.value = data.data.department;
         villageInput.value = data.data.village;
         amountInput.value = data.data.amount;
-
+        monthInput.value=data.data.month;
         if(data.data.student_signature_url) {
           studentSignatureImg.src = data.data.student_signature_url;
           studentSignatureImg.style.display = 'block';

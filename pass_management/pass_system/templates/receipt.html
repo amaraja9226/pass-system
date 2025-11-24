@@ -52,6 +52,18 @@
 </head>
 <body>
     <div class="receipt-card">
+            {% if receipt.payment_status == "PAID" %}
+               <img src="{% static 'paid_stamp.png' %}" class="stamp" alt="Paid Stamp">
+           {% endif %}
+ 
+    <div class="col-4">
+    <h6>Student Uploaded Photo</h6>
+    {% if receipt.student_uploaded_photo %}
+        <img src="{{ receipt.student_uploaded_photo.url }}" alt="Student Photo" style="max-height: 120px; border:1px solid #ccc; padding:5px;">
+    {% else %}
+        <p class="text-muted">No photo uploaded</p>
+    {% endif %}
+  </div>
         <div class="college-header">
             <img src="{% static 'images/siit.png' %}" class="college-logo mb-2" alt="College Logo">
             <h3 class="text-primary">Shriram Shikshan Sanstha, Paniv</h3>
@@ -68,8 +80,23 @@
                 <tr><th>Department</th><td>{{ receipt.department }}</td></tr>
                 <tr><th>Village</th><td>{{ receipt.village }}</td></tr>
                 <tr><th>Amount</th><td>₹ {{ receipt.amount }}</td></tr>
+                <tr><th>Month</th><td>{{receipt.month}}</td></tr>
+                 <tr><th>Payment Status</th>
+                    <td>
+                        {% if receipt.payment_status == "PAID" %}
+                            <span class="text-success fw-bold">PAID</span>
+                        {% else %}
+                            <span class="text-danger fw-bold">UNPAID</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                
+
             </tbody>
         </table>
+   
+
+       
 
         <div class="row text-center mt-4 signatures">
          {% if receipt.student_signature %}
@@ -87,10 +114,22 @@
                 <div class="sign-label">Sub Admin</div>
             </div>
         </div>
+           <div class="text-center mt-4">
+    {% if receipt.payment_status != "PAID" %}
+        <a href="{% url 'fake_payment' receipt.receipt_id %}" class="btn btn-success">Pay Now</a>
+    {% endif %}
+
+    {% if receipt.payment_status == "PAID" %}
+        <a href="{% url 'download_receipt_pdf' receipt.receipt_id %}" class="btn btn-primary">Download PDF</a>
+    {% endif %}
+</div>
+
 
         <div class="receipt-footer">
             Generated automatically by Bus Pass System | {{ current_date }}
         </div>
+
+        
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

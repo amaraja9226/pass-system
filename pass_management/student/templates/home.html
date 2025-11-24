@@ -14,21 +14,54 @@
 <body class="home-bg">
 
   <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow">
-    <div class="container-fluid">
-      <a class="navbar-brand fw-bold" href="#">🎓 Pass Management</a>
-      <div class="d-flex">
-        {% if user.is_authenticated %}
-          <span class="text-white me-3">Welcome, {{ user.username|title }}</span>
-          <a href="{% url 'logout' %}" class="btn btn-outline-light btn-sm">Logout</a>
-          {% else %}
-          <button type="button" class="btn btn-outline-light btn-sm" data-bs-toggle="modal" data-bs-target="#adminLoginModal">
-            Admin Login
-          </button>
-        {% endif %}
+  <!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow">
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold" href="{% url 'home' %}">🎓 Pass Management</a>
+    <div class="d-flex">
+      {% if user.is_authenticated %}
+        <span class="text-white me-3">Welcome, {{ user.username|title }}</span>
+
+        <!-- Admin Dashboard Button -->
+        <button type="button" class="btn btn-outline-light btn-sm me-2" data-bs-toggle="modal" data-bs-target="#adminLoginModal">
+          Admin Dashboard
+        </button>
+
+        <a href="{% url 'logout' %}" class="btn btn-outline-light btn-sm">Logout</a>
+      {% else %}
+        <a href="{% url 'auth_view' %}" class="btn btn-outline-light btn-sm">Login / Signup</a>
+      {% endif %}
+    </div>
+  </div>
+  <!-- Admin Login Modal -->
+<div class="modal fade" id="adminLoginModal" tabindex="-1" aria-labelledby="adminLoginModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="adminLoginModalLabel">Admin Login</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form method="POST" action="{% url 'admin_dashboard_login' %}">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label for="adminUsername" class="form-label">Username</label>
+            <input type="text" class="form-control" id="adminUsername" name="username" required>
+          </div>
+          <div class="mb-3">
+            <label for="adminPassword" class="form-label">Password</label>
+            <input type="password" class="form-control" id="adminPassword" name="password" required>
+          </div>
+          <button type="submit" class="btn btn-primary w-100">Login</button>
+        </form>
       </div>
     </div>
-  </nav>
+  </div>
+</div>
+
+</nav>
+
+
 
   <!-- Dashboard Cards -->
   <div class="container py-5">
@@ -56,11 +89,12 @@
       </div>
       
       <div class="col-md-3 mb-4">
-        <div class="card dashboard-card">
+        <div class="card dashboard-card" >
           <div class="card-body text-center">
             <h4>♻️ ReNew Pass</h4>
             <p class="text-muted">Renew your existing pass in our existing college student  easily.</p>
-            <a href="#" class="btn btn-success w-100">Renew Pass</a>
+         <a href="{% url 'renew_form' %}" class="btn w-100" style="background-color:#ff5722; color:white;">Renew Pass</a>
+
           </div>
         </div>
       </div>
@@ -78,6 +112,47 @@
       </div>
     </div>
   </div>
+  <!-- Check Pass Expiry Section -->
+<!-- Check Pass Expiry Section -->
+<section class="check-expiry-section py-5 bg-light text-center">
+  <div class="container">
+    <h3 class="mb-4">Check Your Pass Expiry</h3>
+
+    <div class="row justify-content-center">
+      <!-- Check Expiry Form -->
+      <div class="col-md-5 mb-2">
+        <form method="POST" action="{% url 'check_pass_expiry' %}" class="d-flex gap-2">
+          {% csrf_token %}
+          <input type="date" name="issue_date" class="form-control" placeholder="Select Issue Date" required>
+          <input type="email" name="email" class="form-control" placeholder="Enter your email" required>
+          <button type="submit" class="btn btn-primary">Check Expiry</button>
+        </form>
+      </div>
+
+      <!-- Expiry Alert + Renew Button -->
+      {% if expiry_info %}
+      <div class="col-md-5 mb-2">
+        <div class="alert {% if expiry_info.is_expired %}alert-danger{% else %}alert-warning{% endif %} d-flex justify-content-between align-items-center mt-3">
+          <span>
+            {% if expiry_info.is_expired %}
+              {{ expiry_info.expiry_date }}: Your pass is expired.
+            {% else %}
+              {{ expiry_info.expiry_date }}: Your pass will expire soon.
+            {% endif %}
+          </span>
+          <a href="{% url 'renew_form' %}" class="btn btn-sm btn-dark">Renew Now</a>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Optional: Backend message -->
+    {% if message %}
+      <div class="alert alert-info mt-3">{{ message }}</div>
+    {% endif %}
+  </div>
+</section>
+
 
   <!-- Bus Images Section -->
   <section class="bus-section text-center py-5">
@@ -85,6 +160,72 @@
     <div class="bus-images d-flex justify-content-center gap-3 flex-wrap">
       <img src="{% static 'images/bus.jpg' %}" alt="Yellow Bus 1" class="bus-img">
     </div>
+    <!-- Bus Images Section -->
+
+    </section>
+
+<!-- ✅ Add Bus Available Villages Section here -->
+<section class="bus-villages-section py-5 bg-light text-center">
+  <div class="container">
+    <h3 class="mb-4">Buses Available From These Villages</h3>
+    <div class="row justify-content-center g-3">
+      <div class="col-md-2">
+        <div class="p-3 shadow rounded bg-white">Shrepur</div>
+      </div>
+      <div class="col-md-2">
+        <div class="p-3 shadow rounded bg-white">velapur</div>
+      </div>
+      <div class="col-md-2">
+        <div class="p-3 shadow rounded bg-white">Akluj</div>
+      </div>
+      <div class="col-md-2">
+        <div class="p-3 shadow rounded bg-white">Piliv</div>
+      </div>
+       <div class="col-md-2">
+        <div class="p-3 shadow rounded bg-white">Kolegav</div>
+      </div>
+       <div class="col-md-2">
+        <div class="p-3 shadow rounded bg-white">Malshiras</div>
+      </div>
+       <div class="col-md-2">
+        <div class="p-3 shadow rounded bg-white">Mhasavd</div>
+      </div>
+     <div class="col-md-2">
+        <div class="p-3 shadow rounded bg-white">Nimbav</div>
+      </div>
+<div class="col-md-2">
+        <div class="p-3 shadow rounded bg-white">Bondale</div>
+      </div>
+
+      <div class="col-md-2">
+        <div class="p-3 shadow rounded bg-white">Temburni</div>
+      </div>
+ <div class="col-md-2">
+        <div class="p-3 shadow rounded bg-white">Garvad</div>
+      </div>
+      <div class="col-md-2">
+        <div class="p-3 shadow rounded bg-white">Malvali</div>
+      </div>
+       <div class="col-md-2">
+        <div class="p-3 shadow rounded bg-white">Fondshiras</div>
+      </div>
+       <div class="col-md-2">
+        <div class="p-3 shadow rounded bg-white">Malinagar</div>
+      </div>
+
+      
+      
+
+
+
+    </div>
+
+  </div>
+</section>
+
+<!-- Special Offer Section -->
+
+
   </section>
 
   <!-- Special Offer Section -->
@@ -190,6 +331,85 @@
     </div>
   </section>
 
+
+  <!-- Testimonials Section -->
+
+
+  <!-- FAQ Section -->
+
+
+<!-- Steps Section (Add here after FAQ) -->
+<!-- Steps Section -->
+<<!-- How It Works / Steps Section with Arrows -->
+
+
+    <!-- How It Works / Steps Section with Horizontal Arrows -->
+<section class="steps-section py-5 text-center bg-light">
+  <div class="container">
+    <h3 class="mb-4">How It Works</h3>
+    <div class="d-flex justify-content-center align-items-center">
+
+      <!-- Step 1 -->
+      <div class="step-card card p-3 shadow-sm text-center mx-2">
+        <h5>Apply for Pass</h5>
+        <p>Click Get Application Letter"<br>For <b>New Student In Our college<br></b>Your Application is Approve or Reject check on your Email.<br>In your Email you Got the Pdf of Application Letter In Application Letter you See the <b>Recipt id </b><br>when you are create a new pass then copy This Recipt id <br>Get a New pass For a new Studnet</p>
+      </div>
+
+      <!-- Arrow -->
+      <div class="step-arrow fs-2 mx-2">→</div>
+
+      <!-- Step 2 -->
+      <div class="step-card card p-3 shadow-sm text-center mx-2">
+        <h5>View Status</h5>
+        <p>Track your pass approval or renewal status.When you got the pass you are go to the "View pass section"<br>See your all the details<br>Like Recipt_id,Name<br>village,Issue Date etc.<br>Then See the Another Button "Click it" Get  new pass section<br><b>Remember one thing is When you are at least on pass Then you can not get the New pass You go the Renew pass Section</b></p>
+      </div>
+
+      <!-- Arrow -->
+      <div class="step-arrow fs-2 mx-2">→</div>
+
+      <!-- Step 3 -->
+      <div class="step-card card p-3 shadow-sm text-center mx-2">
+        <h5>Renew Pass</h5>
+        <p>Click "Renew Now" when your pass is expiring soon<br>When you Pass is expire Then go to the Renew section and Enter the <b>old Recipt id</b><br>Click "Fetch Button" fetch your all THe Details<br>Upload your photo and Signeture Get a Renew Pass<br>Then you got a Renew pass Then click the Pay Button </p>
+      </div>
+
+      <!-- Arrow -->
+      <div class="step-arrow fs-2 mx-2">→</div>
+
+      <!-- Step 4 -->
+      <div class="step-card card p-3 shadow-sm text-center mx-2">
+        <h5>Travel Safely</h5>
+        <p>Prioritize safety: Our state-of-the-art surveillance systems ensure a secure and peaceful journey for all passengers.
+Constant monitoring: Live camera feeds on board all buses are monitored to deter unauthorized behavior and ensure a safe environment.
+Emergency response: Drivers are equipped with direct communication links to security personnel and emergency services.
+</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Optional CSS -->
+<style>
+.step-card {
+  min-width: 180px;
+  max-width: 200px;
+}
+.step-arrow {
+  color: #333;
+  align-self: center;
+}
+@media(max-width:992px){
+  .steps-section .d-flex {
+    flex-direction: column;
+    gap: 15px;
+  }
+  .step-arrow {
+    display: none; /* hide arrows on small screens */
+  }
+}
+</style>
+
   <!-- Offices Section -->
   <section class="offices-section py-5">
     <div class="container">
@@ -220,7 +440,63 @@
     </div>
   </section>
 
-  <!-- Footer -->
+  <!-- Student Feedback / Testimonials Section -->
+<!-- Student Testimonials Section -->
+<section class="testimonials-section py-5 text-center" style="background: #f8f9fa;">
+  <div class="container">
+    <h3 class="mb-5 fw-bold">What Our Students Say</h3>
+    <div id="testimonialCarousel" class="carousel slide" data-bs-ride="carousel">
+      <div class="carousel-inner">
+
+        <div class="carousel-item active">
+          <div class="card mx-auto p-4 shadow-sm" style="max-width: 600px; border-radius: 15px; background-color: white;">
+            <img src="{% static 'images/s1.jpg' %}" 
+                 alt="Student A" 
+                 class="rounded-circle mb-3 shadow" 
+                 style="width:100px; height:100px; object-fit:cover; border:3px solid #0d6efd;">
+            <p class="lead fst-italic">“Renewal was super easy!”</p>
+            <h6 class="fw-bold mt-2">Neha</h6>
+          </div>
+        </div>
+
+        <div class="carousel-item">
+          <div class="card mx-auto p-4 shadow-sm" style="max-width: 600px; border-radius: 15px; background-color: white;">
+            <img src="{% static 'images/s2.jpg' %}" 
+                 alt="Student B" 
+                 class="rounded-circle mb-3 shadow" 
+                 style="width:100px; height:100px; object-fit:cover; border:3px solid #0d6efd;">
+            <p class="lead fst-italic">“I never have to stand in line anymore!”</p>
+            <h6 class="fw-bold mt-2">Rani</h6>
+          </div>
+        </div>
+
+        <div class="carousel-item">
+          <div class="card mx-auto p-4 shadow-sm" style="max-width: 600px; border-radius: 15px; background-color: white;">
+            <img src="{% static 'images/s3.jpg' %}" 
+                 alt="Student C" 
+                 class="rounded-circle mb-3 shadow" 
+                 style="width:100px; height:100px; object-fit:cover; border:3px solid #0d6efd;">
+            <p class="lead fst-italic">“The online pass system saved me a lot of time.”</p>
+            <h6 class="fw-bold mt-2">Kunal</h6>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Carousel Controls -->
+      <button class="carousel-control-prev" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" style="background-color: #0d6efd; border-radius:50%; width:40px; height:40px;" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon" style="background-color: #0d6efd; border-radius:50%; width:40px; height:40px;" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+      </button>
+
+    </div>
+  </div>
+</section>
+
   <footer class="text-center py-3 bg-primary text-white shadow-sm">
     <small>© 2025 Student Pass Management | Developed by SG Team</small>
   </footer>
@@ -254,6 +530,7 @@
   <!-- JavaScript -->
   <script src="{% static 'student/js/script.js' %}"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  
 
 </body>
 </html>

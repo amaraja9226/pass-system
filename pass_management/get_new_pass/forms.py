@@ -3,12 +3,27 @@ from .models import PassApplication
 from datetime import datetime
 
 class PassApplicationForm(forms.ModelForm):
+    MONTH_CHOICES = [
+        ('January', 'January'),
+        ('February', 'February'),
+        ('March', 'March'),
+        ('April', 'April'),
+        ('May', 'May'),
+        ('June', 'June'),
+        ('July', 'July'),
+        ('August', 'August'),
+        ('September', 'September'),
+        ('October', 'October'),
+        ('November', 'November'),
+        ('December', 'December'),
+    ]
+
     class Meta:
         model = PassApplication
         fields = [
             'name', 'email', 'department', 'class_name', 'village',
             'reason', 'pass_days', 'application_date', 'application_time',
-            'student_signature'
+            'month', 'student_signature'
         ]
 
         widgets = {
@@ -49,6 +64,10 @@ class PassApplicationForm(forms.ModelForm):
                 'class':'form-control',
                 'readonly':'readonly'
             }, format='%H:%M:%S'),
+
+            # ✅ Month dropdown
+                       'month': forms.Select(attrs={'class': 'form-control'}),
+
             'student_signature': forms.ClearableFileInput(attrs={
                 'class':'form-control'
             }),
@@ -57,5 +76,7 @@ class PassApplicationForm(forms.ModelForm):
     # Set default values for date and time
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields['month'].choices = self.MONTH_CHOICES
+
         self.fields['application_date'].initial = datetime.today().date()
         self.fields['application_time'].initial = datetime.now().strftime("%H:%M:%S")

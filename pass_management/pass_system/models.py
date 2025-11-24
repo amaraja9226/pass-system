@@ -3,7 +3,7 @@ from get_new_pass.models import PassApplication
 
 class IssuePass(models.Model):
     pass_number = models.AutoField(primary_key=True)
-    receipt_id = models.CharField(max_length=50)
+    receipt_id = models.CharField(max_length=50,)
     student_name = models.CharField(max_length=200)
     email = models.EmailField(null=True, blank=True)  # optional
     student_class = models.CharField(max_length=50)
@@ -19,6 +19,12 @@ class IssuePass(models.Model):
     admin_signature = models.FileField(upload_to='signatures/admin/', null=True, blank=True)
     sub_admin_signature = models.FileField(upload_to='signatures/subadmin/', null=True, blank=True)
     payment_status = models.CharField(max_length=20, choices=[('Pending', 'Pending'), ('Sent', 'Sent')], default='Pending')
+    month = models.CharField(max_length=20, null=True, blank=True)
+    # Existing fields ke niche
+    student_uploaded_photo = models.FileField(
+    upload_to='student_photos/', null=True, blank=True
+    )
+
 
     def __str__(self):
         return f"Pass #{self.pass_number} - {self.student_name}"

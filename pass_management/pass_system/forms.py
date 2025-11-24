@@ -12,6 +12,8 @@ class IssuePassForm(forms.ModelForm):
             'department',
             'village',
             'amount',
+            'month',
+            'student_uploaded_photo',
         ]
 
 
@@ -28,13 +30,18 @@ class IssuePassForm(forms.ModelForm):
             'department': forms.TextInput(attrs={
                 'class': 'form-control', 'readonly': 'readonly', 'id': 'department'
             }),
-            'village': forms.TextInput(attrs={
+            'village':forms.TextInput(attrs={
                 'class': 'form-control', 'readonly': 'readonly', 'id': 'village'
             }),
             'amount': forms.NumberInput(attrs={
                 'class': 'form-control', 'readonly': 'readonly', 'id': 'amount'
             }),
+            'month': forms.TextInput(attrs={
+                'class': 'form-control', 'readonly': 'readonly', 'id': 'month'
+        }),
+        'student_uploaded_photo': forms.ClearableFileInput(attrs={
+                'class': 'form-control'
+            }),
         }
-
         
 

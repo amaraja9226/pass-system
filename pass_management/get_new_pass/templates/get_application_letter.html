@@ -19,9 +19,11 @@
       <p>
         I, <strong>{{ app.name }}</strong>, studying in <strong>{{ app.class_name }}</strong>, 
         Department: <strong>{{ app.department }}</strong>, residing at <strong>{{ app.village }}</strong>, 
-        request you to kindly issue me a bus pass for <strong>{{ app.pass_days }} days</strong>.
+        request you to kindly issue me a bus pass for <strong>{{ app.pass_days }} days for </strong><strong>{{app.month}}  month</strong>
       </p>
       <p><strong>Reason:</strong> {{ app.reason }}</p>
+      <p><strong>Receipt ID:</strong> {{ app.receipt_id }}</p>
+
       <p>Thank you.</p>
       <p>Sincerely,</p>
       <p><strong>{{ app.name }}</strong></p>

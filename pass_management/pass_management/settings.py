@@ -31,9 +31,11 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+
     'pass_system',  
     'get_new_pass',   #create application letter
     'student',       #home page app
+    'renew_pass',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

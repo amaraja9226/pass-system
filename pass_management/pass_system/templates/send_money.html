@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pay Fee</title>
+</head>
+<body>
+
+<h2>Pay Bus Pass Amount: ₹ {{ receipt.amount }}</h2>
+
+<form>
+    <script
+        src="https://checkout.razorpay.com/v1/checkout.js"
+        data-key="{{ razorpay_key }}"
+        data-amount="{{ order_amount }}"
+        data-currency="INR"
+        data-order_id="{{ order_id }}"
+        data-buttontext="Pay Now"
+        data-name="College Bus Pass"
+        data-description="Bus Pass Payment"
+        data-theme.color="#528FF0"
+        data-callback_url="{% url 'payment_success' %}?pass_number={{ receipt.pass_number }}"
+    >
+    </script>
+</form>
+
+</body>
+</html>

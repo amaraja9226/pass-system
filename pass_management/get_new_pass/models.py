@@ -1,6 +1,19 @@
-# get_new_pass/models.py
-
 from django.db import models
+
+MONTH_CHOICES = [
+    ('January', 'January'),
+    ('February', 'February'),
+    ('March', 'March'),
+    ('April', 'April'),
+    ('May', 'May'),
+    ('June', 'June'),
+    ('July', 'July'),
+    ('August', 'August'),
+    ('September', 'September'),
+    ('October', 'October'),
+    ('November', 'November'),
+    ('December', 'December'),
+]
 
 class PassApplication(models.Model):
     name = models.CharField(max_length=100)
@@ -12,6 +25,8 @@ class PassApplication(models.Model):
     application_date = models.DateField()
     application_time = models.TimeField()
     reason = models.TextField()
+
+    month = models.CharField(max_length=20, choices=MONTH_CHOICES, default="January")
     status = models.CharField(
         max_length=20,
         choices=[('Pending', 'Pending'), ('Approved', 'Approved'), ('Rejected', 'Rejected')],

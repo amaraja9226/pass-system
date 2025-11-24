@@ -30,8 +30,11 @@ urlpatterns = [
     path('get_new_pass/',include('get_new_pass.urls')),
    
     path('pass_system/', include('pass_system.urls')),
+    path('renew/', include('renew_pass.urls')),
+
    
      path('admin/', admin.site.urls)
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+

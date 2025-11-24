@@ -150,9 +150,13 @@ def approve_application(request, app_id):
 
     # Generate PDF
     html_content = render_to_string(
-        'get_application_letter.html',
-        {'app': app, 'admin_signature': 'Admin Name'}
-    )
+    'get_application_letter.html',
+    {
+        'app': app,
+        'receipt_id': app.receipt_id,      # <-- ADD THIS LINE
+        'admin_signature': 'Admin Name'
+    }
+)
 
     pdf_buffer = BytesIO()
     pisa_status = pisa.CreatePDF(src=html_content, dest=pdf_buffer)
